@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   logout,
   getValidationRules,
   deployChanges,
+  me,
 } from "../api/salesforce";
 import Toggle from "../components/Toggle";
 import Button from "../components/Button";
@@ -13,6 +14,12 @@ export default function Switch() {
   const [loaded, setLoaded] = useState(false);
   const [deploying, setDeploying] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    me().catch(() => {
+      window.location.href = "/";
+    });
+  }, []);
 
   const loadRules = async () => {
     try {
@@ -58,14 +65,6 @@ export default function Switch() {
         <div className="switch-card">
           <h1 className="switch-title">Salesforce Switch</h1>
 
-          <p className="switch-description">
-            Manage and control Account validation rules in your Salesforce
-            organization from a single interface.
-            <br />
-            Enable, disable, and deploy rule changes securely using Salesforce
-            Metadata APIs.
-          </p>
-
           <div className="switch-actions">
             <Button text="Logout" variant="secondary" onClick={handleLogout} />
             <Button
@@ -79,78 +78,27 @@ export default function Switch() {
 
       {loaded && (
         <div className="rules-container">
-          <h2 className="rules-heading">Validation Rules</h2>
-
-          {rules.length === 0 && (
-            <div className="empty-state">
-              No validation rules found for this Account object.
-            </div>
-          )}
-
-          {rules.length > 0 && (
-            <div className="rules-table">
-              <div className="rules-header">
-                <span>Rule Name</span>
-                <span>Status</span>
-              </div>
-
-              {rules.map((r) => (
-                <div className="rules-row" key={r.name}>
-                  <span className="rule-name">{r.name}</span>
-                  <Toggle
-                    checked={r.active}
-                    onChange={() => toggleRule(r.name)}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="rules-footer">
-            <div className="rules-footer-left">
-              <Button
-                text="Enable All"
-                variant="primary"
-                onClick={() =>
-                  !deploying &&
-                  setRules((r) => r.map((x) => ({ ...x, active: true })))
-                }
-              />
-              <Button
-                text="Disable All"
-                variant="primary"
-                onClick={() =>
-                  !deploying &&
-                  setRules((r) => r.map((x) => ({ ...x, active: false })))
-                }
+          {rules.map((r) => (
+            <div className="rules-row" key={r.name}>
+              <span>{r.name}</span>
+              <Toggle
+                checked={r.active}
+                onChange={() => toggleRule(r.name)}
               />
             </div>
+          ))}
 
-            <div className="rules-footer-right">
-              <Button
-                text={deploying ? "Deploying..." : "Deploy Changes"}
-                variant="primary"
-                onClick={deploy}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {deploying && (
-        <div className="deploy-overlay">
-          <div className="deploy-box">
-            <div className="spinner" />
-            <p>Deploying changes to Salesforce</p>
-          </div>
+          <Button
+            text={deploying ? "Deploying..." : "Deploy Changes"}
+            onClick={deploy}
+          />
         </div>
       )}
 
       {success && (
         <div className="deploy-overlay">
           <div className="deploy-success-box">
-            <h3>Deployment Successful</h3>
-            <p>Validation rules have been updated in Salesforce.</p>
+            Deployment Successful
           </div>
         </div>
       )}

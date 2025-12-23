@@ -1,16 +1,7 @@
-import { useEffect } from "react";
-import { login, me } from "../api/salesforce";
+import { login } from "../api/salesforce";
 import "../styles/login.css";
 
 export default function Login() {
-  useEffect(() => {
-    me()
-      .then(() => {
-        window.location.href = "/switch";
-      })
-      .catch(() => {});
-  }, []);
-
   return (
     <div className="login-container">
       <div className="login-card">
