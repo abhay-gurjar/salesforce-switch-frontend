@@ -15,14 +15,18 @@ export default function Switch() {
   const [success, setSuccess] = useState(false);
 
   const loadRules = async () => {
-    const res = await getValidationRules();
-    setRules(
-      res.data.map((r) => ({
-        name: r.ValidationName,
-        active: r.Active,
-      }))
-    );
-    setLoaded(true);
+    try {
+      const res = await getValidationRules();
+      setRules(
+        res.data.map((r) => ({
+          name: r.ValidationName,
+          active: r.Active,
+        }))
+      );
+      setLoaded(true);
+    } catch {
+      window.location.href = "/";
+    }
   };
 
   const toggleRule = (name) => {
@@ -43,6 +47,11 @@ export default function Switch() {
     setTimeout(() => setSuccess(false), 2500);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = "/";
+  };
+
   return (
     <div className="switch-container">
       {!loaded && (
@@ -58,7 +67,7 @@ export default function Switch() {
           </p>
 
           <div className="switch-actions">
-            <Button text="Logout" variant="secondary" onClick={logout} />
+            <Button text="Logout" variant="secondary" onClick={handleLogout} />
             <Button
               text="Get Validation Rules"
               variant="primary"
@@ -71,13 +80,6 @@ export default function Switch() {
       {loaded && (
         <div className="rules-container">
           <h2 className="rules-heading">Validation Rules</h2>
-
-          <p className="rules-description">
-            Review and manage Account validation rules from a centralized
-            interface.
-            <br />
-            Toggle rules on or off and deploy changes directly to Salesforce.
-          </p>
 
           {rules.length === 0 && (
             <div className="empty-state">
