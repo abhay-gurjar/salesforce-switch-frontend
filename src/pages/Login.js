@@ -8,10 +8,7 @@ export default function Login() {
         <h1 className="login-title">Salesforce Login</h1>
 
         <p className="login-description">
-          Connect securely to your Salesforce organization to manage
-          and control Account validation rules.
-          <br />
-          Login using OAuth authentication to continue.
+          Login to Salesforce to manage Account validation rules.
         </p>
 
         <button className="login-button" onClick={login}>

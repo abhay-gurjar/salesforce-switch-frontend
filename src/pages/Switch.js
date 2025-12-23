@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  logout,
-  getValidationRules,
-  deployChanges,
-  me,
-} from "../api/salesforce";
+import { useState } from "react";
+import { logout, getValidationRules, deployChanges } from "../api/salesforce";
 import Toggle from "../components/Toggle";
 import Button from "../components/Button";
 import "../styles/switch.css";
@@ -12,74 +7,48 @@ import "../styles/switch.css";
 export default function Switch() {
   const [rules, setRules] = useState([]);
   const [loaded, setLoaded] = useState(false);
-  const [deploying, setDeploying] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    me().catch(() => {
-      window.location.href = "/";
-    });
-  }, []);
 
   const loadRules = async () => {
-    try {
-      const res = await getValidationRules();
-      setRules(
-        res.data.map((r) => ({
-          name: r.ValidationName,
-          active: r.Active,
-        }))
-      );
-      setLoaded(true);
-    } catch {
-      window.location.href = "/";
-    }
+    const res = await getValidationRules();
+    setRules(
+      res.data.map(r => ({
+        name: r.ValidationName,
+        active: r.Active,
+      }))
+    );
+    setLoaded(true);
   };
 
   const toggleRule = (name) => {
-    if (deploying) return;
-    setRules((prev) =>
-      prev.map((r) =>
+    setRules(prev =>
+      prev.map(r =>
         r.name === name ? { ...r, active: !r.active } : r
       )
     );
   };
 
   const deploy = async () => {
-    setDeploying(true);
-    setSuccess(false);
     await deployChanges(rules);
-    setDeploying(false);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 2500);
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    window.location.href = "/";
+    alert("Deployment Successful");
   };
 
   return (
     <div className="switch-container">
       {!loaded && (
         <div className="switch-card">
-          <h1 className="switch-title">Salesforce Switch</h1>
-
-          <div className="switch-actions">
-            <Button text="Logout" variant="secondary" onClick={handleLogout} />
-            <Button
-              text="Get Validation Rules"
-              variant="primary"
-              onClick={loadRules}
-            />
-          </div>
+          <Button text="Logout" variant="secondary" onClick={logout} />
+          <Button
+            text="Get Validation Rules"
+            variant="primary"
+            onClick={loadRules}
+          />
         </div>
       )}
 
       {loaded && (
-        <div className="rules-container">
-          {rules.map((r) => (
-            <div className="rules-row" key={r.name}>
+        <>
+          {rules.map(r => (
+            <div key={r.name} className="rules-row">
               <span>{r.name}</span>
               <Toggle
                 checked={r.active}
@@ -88,19 +57,8 @@ export default function Switch() {
             </div>
           ))}
 
-          <Button
-            text={deploying ? "Deploying..." : "Deploy Changes"}
-            onClick={deploy}
-          />
-        </div>
-      )}
-
-      {success && (
-        <div className="deploy-overlay">
-          <div className="deploy-success-box">
-            Deployment Successful
-          </div>
-        </div>
+          <Button text="Deploy Changes" onClick={deploy} />
+        </>
       )}
     </div>
   );
