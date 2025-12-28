@@ -1,21 +1,20 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
-});
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 export const login = () => {
-  window.location.href = `${process.env.REACT_APP_API_URL}/login`;
+  window.location.href = `${BASE_URL}/api/login`;
 };
 
 export const getValidationRules = () => {
-  return api.get("/validation-rules");
+  return axios.get(`${BASE_URL}/api/rules`);
 };
 
 export const deployChanges = (rules) => {
-  return api.post("/deploy", { rules });
+  return axios.post(`${BASE_URL}/api/deploy`, { rules });
 };
 
-export const logout = () => {
-  window.location.href = `${process.env.REACT_APP_API_URL}/logout`;
+export const logout = async () => {
+  await axios.post(`${BASE_URL}/api/logout`);
+  window.location.href = "/";
 };

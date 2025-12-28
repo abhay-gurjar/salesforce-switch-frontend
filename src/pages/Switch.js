@@ -15,14 +15,18 @@ export default function Switch() {
   const [success, setSuccess] = useState(false);
 
   const loadRules = async () => {
-    const res = await getValidationRules();
-    setRules(
-      res.data.map((r) => ({
-        name: r.ValidationName,
-        active: r.Active,
-      }))
-    );
-    setLoaded(true);
+    try {
+      const res = await getValidationRules();
+      setRules(
+        res.data.map((r) => ({
+          name: r.ValidationName,
+          active: r.Active,
+        }))
+      );
+      setLoaded(true);
+    } catch {
+      window.location.href = "/";
+    }
   };
 
   const toggleRule = (name) => {
@@ -43,6 +47,12 @@ export default function Switch() {
     setTimeout(() => setSuccess(false), 2500);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setRules([]);
+    setLoaded(false);
+  };
+
   return (
     <div className="switch-container">
       {!loaded && (
@@ -58,7 +68,7 @@ export default function Switch() {
           </p>
 
           <div className="switch-actions">
-            <Button text="Logout" variant="secondary" onClick={logout} />
+            <Button text="Logout" variant="secondary" onClick={handleLogout} />
             <Button
               text="Get Validation Rules"
               variant="primary"
