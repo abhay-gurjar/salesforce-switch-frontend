@@ -13,8 +13,10 @@ export default function Switch() {
   const [loaded, setLoaded] = useState(false);
   const [deploying, setDeploying] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const loadRules = async () => {
+    setError("");
     try {
       const res = await getValidationRules();
       setRules(
@@ -24,8 +26,12 @@ export default function Switch() {
         }))
       );
       setLoaded(true);
-    } catch {
-      window.location.replace("/");
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        window.location.replace("/");
+      } else {
+        setError("Unable to load validation rules. Please try again.");
+      }
     }
   };
 
@@ -67,6 +73,8 @@ export default function Switch() {
             Enable, disable, and deploy rule changes securely using Salesforce
             Metadata APIs.
           </p>
+
+          {error && <p className="error-text">{error}</p>}
 
           <div className="switch-actions">
             <Button
