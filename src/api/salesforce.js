@@ -7,7 +7,7 @@ export const login = () => {
 };
 
 export const getValidationRules = () => {
-  return axios.get(`${BASE_URL}/api/rules`);
+  return axios.get(`${BASE_URL}/api/validation-rules`);
 };
 
 export const deployChanges = (rules) => {
