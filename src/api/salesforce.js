@@ -3,7 +3,7 @@ import axios from "axios";
 const BASE_URL = process.env.REACT_APP_API_URL;
 
 export const login = () => {
-  window.location.href = `${BASE_URL}/api/login`;
+  window.location.replace(`${BASE_URL}/api/login`);
 };
 
 export const getValidationRules = () => {
@@ -15,6 +15,6 @@ export const deployChanges = (rules) => {
 };
 
 export const logout = async () => {
-  await axios.post(`${BASE_URL}/api/logout`);
-  window.location.href = "/";
+  await axios.get(`${BASE_URL}/api/logout`);
+  window.location.replace("/");
 };

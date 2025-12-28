@@ -25,7 +25,7 @@ export default function Switch() {
       );
       setLoaded(true);
     } catch {
-      window.location.href = "/";
+      window.location.replace("/");
     }
   };
 
@@ -51,6 +51,7 @@ export default function Switch() {
     await logout();
     setRules([]);
     setLoaded(false);
+    window.location.replace("/");
   };
 
   return (
@@ -68,7 +69,11 @@ export default function Switch() {
           </p>
 
           <div className="switch-actions">
-            <Button text="Logout" variant="secondary" onClick={handleLogout} />
+            <Button
+              text="Logout"
+              variant="secondary"
+              onClick={handleLogout}
+            />
             <Button
               text="Get Validation Rules"
               variant="primary"
@@ -121,7 +126,9 @@ export default function Switch() {
                 variant="primary"
                 onClick={() =>
                   !deploying &&
-                  setRules((r) => r.map((x) => ({ ...x, active: true })))
+                  setRules((r) =>
+                    r.map((x) => ({ ...x, active: true }))
+                  )
                 }
               />
               <Button
@@ -129,7 +136,9 @@ export default function Switch() {
                 variant="primary"
                 onClick={() =>
                   !deploying &&
-                  setRules((r) => r.map((x) => ({ ...x, active: false })))
+                  setRules((r) =>
+                    r.map((x) => ({ ...x, active: false }))
+                  )
                 }
               />
             </div>
