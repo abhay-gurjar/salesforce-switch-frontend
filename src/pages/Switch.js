@@ -15,6 +15,10 @@ export default function Switch() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  // 🔹 NEW STATES FOR FILTERING
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
   const loadRules = async () => {
     setError("");
     try {
@@ -60,6 +64,28 @@ export default function Switch() {
     window.location.replace("/");
   };
 
+  // 🔹 FILTER LOGIC (CORE PART)
+  const filteredRules = rules.filter((rule) => {
+    // Search by rule name
+    if (
+      searchText &&
+      !rule.name.toLowerCase().includes(searchText.toLowerCase())
+    ) {
+      return false;
+    }
+
+    // Status filter
+    if (statusFilter === "Active" && !rule.active) {
+      return false;
+    }
+
+    if (statusFilter === "Inactive" && rule.active) {
+      return false;
+    }
+
+    return true;
+  });
+
   return (
     <div className="switch-container">
       {!loaded && (
@@ -77,11 +103,7 @@ export default function Switch() {
           {error && <p className="error-text">{error}</p>}
 
           <div className="switch-actions">
-            <Button
-              text="Logout"
-              variant="secondary"
-              onClick={handleLogout}
-            />
+            <Button text="Logout" variant="secondary" onClick={handleLogout} />
             <Button
               text="Get Validation Rules"
               variant="primary"
@@ -102,20 +124,39 @@ export default function Switch() {
             Toggle rules on or off and deploy changes directly to Salesforce.
           </p>
 
-          {rules.length === 0 && (
+          {/* 🔹 FILTER UI */}
+          <div className="rules-filters">
+            <input
+              type="text"
+              placeholder="Search rule name"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
+          {filteredRules.length === 0 && (
             <div className="empty-state">
-              No validation rules found for this Account object.
+              No validation rules match the selected filters.
             </div>
           )}
 
-          {rules.length > 0 && (
+          {filteredRules.length > 0 && (
             <div className="rules-table">
               <div className="rules-header">
                 <span>Rule Name</span>
                 <span>Status</span>
               </div>
 
-              {rules.map((r) => (
+              {filteredRules.map((r) => (
                 <div className="rules-row" key={r.name}>
                   <span className="rule-name">{r.name}</span>
                   <Toggle
@@ -134,18 +175,27 @@ export default function Switch() {
                 variant="primary"
                 onClick={() =>
                   !deploying &&
-                  setRules((r) =>
-                    r.map((x) => ({ ...x, active: true }))
+                  setRules((prev) =>
+                    prev.map((r) =>
+                      filteredRules.some((f) => f.name === r.name)
+                        ? { ...r, active: true }
+                        : r
+                    )
                   )
                 }
               />
+
               <Button
                 text="Disable All"
                 variant="primary"
                 onClick={() =>
                   !deploying &&
-                  setRules((r) =>
-                    r.map((x) => ({ ...x, active: false }))
+                  setRules((prev) =>
+                    prev.map((r) =>
+                      filteredRules.some((f) => f.name === r.name)
+                        ? { ...r, active: false }
+                        : r
+                    )
                   )
                 }
               />
